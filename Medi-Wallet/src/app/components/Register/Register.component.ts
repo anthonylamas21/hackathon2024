@@ -1,15 +1,15 @@
-import { Component, Inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  selector: 'app-register',
+  templateUrl: './register.component.html',
+  styleUrls: ['./register.component.css']
 })
-export class LoginComponent {
-  loginForm: FormGroup;
+export class RegisterComponent {
+  registerForm: FormGroup;
   isLoading = false;
   errorMessage = '';
 
@@ -18,31 +18,30 @@ export class LoginComponent {
     private authService: AuthService,
     private router: Router
   ) {
-    this.loginForm = this.fb.group({
+    this.registerForm = this.fb.group({
+      username: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required]]
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
   onSubmit(): void {
-    if (this.loginForm.invalid) return;
+    if (this.registerForm.invalid) return;
 
     this.isLoading = true;
     this.errorMessage = '';
 
-    const { email, password } = this.loginForm.value;
-
-    this.authService.login(email, password).subscribe({
+    this.authService.register(this.registerForm.value).subscribe({
       next: (success) => {
         if (success) {
-          alert('Inicio de sesión exitoso!');
-          this.router.navigate(['/dashboard']);
+          alert('Registro exitoso!');
+          this.router.navigate(['/login']);
         } else {
-          this.errorMessage = 'Email o contraseña incorrectos';
+          this.errorMessage = 'El email ya está registrado';
         }
       },
       error: (error) => {
-        this.errorMessage = 'Error al iniciar sesión';
+        this.errorMessage = 'Error al registrar el usuario';
         console.error(error);
       },
       complete: () => {
